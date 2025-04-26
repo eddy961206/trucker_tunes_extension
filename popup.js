@@ -41,7 +41,37 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (streamData[currentGameType].length > 0) {
     selectChannel(currentChannelIndex);
   }
+  
+  // 백그라운드 스크립트와 통신 설정
+  setupBackgroundCommunication();
 });
+
+// 백그라운드 스크립트와 통신 설정
+function setupBackgroundCommunication() {
+  // 백그라운드 스크립트에서 현재 재생 상태 확인
+  chrome.runtime.sendMessage({ action: 'getPlaybackState' }, response => {
+    if (response && response.isPlaying) {
+      // 백그라운드에서 재생 중인 경우 UI 업데이트
+      currentGameType = response.gameType;
+      currentChannelIndex = response.channelIndex;
+      isPlaying = true;
+      
+      // UI 업데이트
+      document.getElementById('play-btn').textContent = 'Pause';
+      
+      // 탭 활성화
+      document.getElementById('ats-tab').classList.toggle('active', currentGameType === 'ats');
+      document.getElementById('ets2-tab').classList.toggle('active', currentGameType === 'ets2');
+      
+      // 채널 정보 업데이트
+      if (streamData[currentGameType] && streamData[currentGameType][currentChannelIndex]) {
+        const station = streamData[currentGameType][currentChannelIndex];
+        document.getElementById('current-station').textContent = station.name;
+        document.getElementById('station-genre').textContent = `${station.genre} | ${station.language} | ${station.bitrate}kbps`;
+      }
+    }
+  });
+}
 
 // UI 초기화
 function initUI() {
@@ -69,7 +99,7 @@ function initFilterOptions() {
   });
   
   // 장르 옵션 추가
-  genreFilter.innerHTML = '<option value="">모든 장르</option>';
+  genreFilter.innerHTML = '<option value="">All genres</option>';
   [...genres].sort().forEach(genre => {
     const option = document.createElement('option');
     option.value = genre;
@@ -78,7 +108,7 @@ function initFilterOptions() {
   });
   
   // 언어 옵션 추가
-  languageFilter.innerHTML = '<option value="">모든 언어</option>';
+  languageFilter.innerHTML = '<option value="">All languages</option>';
   [...languages].sort().forEach(language => {
     const option = document.createElement('option');
     option.value = language;
@@ -104,7 +134,12 @@ function setupEventListeners() {
   
   // 볼륨 조절
   document.getElementById('volume-slider').addEventListener('input', (e) => {
-    audioPlayer.volume = e.target.value;
+    const volume = e.target.value;
+    // 백그라운드 오디오 볼륨도 업데이트
+    chrome.runtime.sendMessage({ 
+      action: 'setVolume', 
+      volume: volume 
+    });
   });
   
   // 검색 및 필터
@@ -114,18 +149,18 @@ function setupEventListeners() {
   
   // 오디오 이벤트
   audioPlayer.addEventListener('play', () => {
-    document.getElementById('play-btn').textContent = '일시정지';
+    document.getElementById('play-btn').textContent = 'Pause';
     isPlaying = true;
   });
   
   audioPlayer.addEventListener('pause', () => {
-    document.getElementById('play-btn').textContent = '재생';
+    document.getElementById('play-btn').textContent = 'Play';
     isPlaying = false;
   });
   
   audioPlayer.addEventListener('error', () => {
     console.error('오디오 재생 오류:', audioPlayer.error);
-    document.getElementById('play-btn').textContent = '재생';
+    document.getElementById('play-btn').textContent = 'Play';
     isPlaying = false;
   });
 }
@@ -209,7 +244,7 @@ function displayStationList() {
   if (filteredStations.length === 0) {
     const emptyItem = document.createElement('li');
     emptyItem.className = 'station-item';
-    emptyItem.textContent = currentView === 'favorites' ? '즐겨찾기한 채널이 없습니다.' : '검색 결과가 없습니다.';
+    emptyItem.textContent = currentView === 'favorites' ? 'No favorite channels' : 'No search results';
     stationList.appendChild(emptyItem);
     return;
   }
@@ -290,26 +325,28 @@ function selectChannel(index) {
     currentStationItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
   
-  // 오디오 소스 변경
-  const wasPlaying = !audioPlayer.paused;
-  audioPlayer.src = station.url;
-  
-  // 이전에 재생 중이었다면 자동 재생
-  if (wasPlaying) {
-    audioPlayer.play().catch(error => {
-      console.error('자동 재생 실패:', error);
-    });
-  }
+  // 백그라운드 스크립트에 채널 변경 알림
+  chrome.runtime.sendMessage({
+    action: 'changeChannel',
+    gameType: currentGameType,
+    channelIndex: index,
+    station: station
+  });
 }
 
 // 재생/일시정지 토글
 function togglePlayPause() {
-  if (audioPlayer.paused) {
-    audioPlayer.play().catch(error => {
-      console.error('재생 실패:', error);
+  if (!isPlaying) {
+    // 백그라운드 스크립트에 재생 요청
+    chrome.runtime.sendMessage({
+      action: 'play',
+      gameType: currentGameType,
+      channelIndex: currentChannelIndex,
+      station: streamData[currentGameType][currentChannelIndex]
     });
   } else {
-    audioPlayer.pause();
+    // 백그라운드 스크립트에 일시정지 요청
+    chrome.runtime.sendMessage({ action: 'pause' });
   }
 }
 
@@ -320,11 +357,6 @@ function playPrevChannel() {
     newIndex = streamData[currentGameType].length - 1;
   }
   selectChannel(newIndex);
-  if (isPlaying) {
-    audioPlayer.play().catch(error => {
-      console.error('재생 실패:', error);
-    });
-  }
 }
 
 // 다음 채널 재생
@@ -334,11 +366,6 @@ function playNextChannel() {
     newIndex = 0;
   }
   selectChannel(newIndex);
-  if (isPlaying) {
-    audioPlayer.play().catch(error => {
-      console.error('재생 실패:', error);
-    });
-  }
 }
 
 // 즐겨찾기 여부 확인
