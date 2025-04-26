@@ -415,3 +415,19 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 });
 
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === 'playbackStateChanged') {
+    isPlaying = message.data.isPlaying;
+    document.getElementById('play-btn').textContent = isPlaying ? 'Pause' : 'Play';
+
+    // 에러 안내 메시지 처리
+    const errorDiv = document.getElementById('error-message');
+    if (message.data.error) {
+      errorDiv.textContent = 'This channel cannot be played at the moment';
+      errorDiv.style.display = 'block';
+    } else {
+      errorDiv.textContent = '';
+      errorDiv.style.display = 'none';
+    }
+  }
+});
