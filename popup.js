@@ -38,9 +38,23 @@ document.addEventListener('DOMContentLoaded', async () => {
   audioPlayer.volume = document.getElementById('volume-slider').value;
   
   // 마지막 채널 선택
-  if (streamData[currentGameType].length > 0) {
-    selectChannel(currentChannelIndex);
-  }
+  // 백그라운드 스크립트와 통신 설정
+  chrome.runtime.sendMessage({ action: 'getPlaybackState' }, response => {
+    if (response && response.isPlaying) {
+      // 이미 재생 중이면 selectChannel 호출하지 않음
+      currentGameType = response.gameType;
+      currentChannelIndex = response.channelIndex;
+      isPlaying = true;
+      // UI만 맞춰주기
+      document.getElementById('play-btn').textContent = 'Pause';
+      // ... 나머지 UI 업데이트 ...
+    } else {
+      // 재생 중이 아니면 마지막 채널 선택
+      if (streamData[currentGameType].length > 0) {
+        selectChannel(currentChannelIndex);
+      }
+    }
+  });
   
   // 백그라운드 스크립트와 통신 설정
   setupBackgroundCommunication();
