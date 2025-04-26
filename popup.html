@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trucker Tunes</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Trucker Tunes</h1>
+      <div class="tabs">
+        <button id="ats-tab" class="tab-btn active">American Truck Simulator</button>
+        <button id="ets2-tab" class="tab-btn">Euro Truck Simulator 2</button>
+      </div>
+    </header>
+    
+    <div class="player-container">
+      <div class="now-playing">
+        <div class="station-info">
+          <h2 id="current-station">선택된 채널 없음</h2>
+          <p id="station-genre"></p>
+        </div>
+        <div class="controls">
+          <button id="prev-btn" class="control-btn">이전</button>
+          <button id="play-btn" class="control-btn">재생</button>
+          <button id="next-btn" class="control-btn">다음</button>
+        </div>
+        <div class="volume-control">
+          <span>볼륨:</span>
+          <input type="range" id="volume-slider" min="0" max="1" step="0.1" value="0.7">
+        </div>
+      </div>
+    </div>
+    
+    <div class="station-list-container">
+      <div class="filter-container">
+        <input type="text" id="search-input" placeholder="채널 검색...">
+        <select id="genre-filter">
+          <option value="">모든 장르</option>
+        </select>
+        <select id="language-filter">
+          <option value="">모든 언어</option>
+        </select>
+      </div>
+      
+      <div class="view-options">
+        <button id="all-stations-btn" class="view-btn active">모든 채널</button>
+        <button id="favorites-btn" class="view-btn">즐겨찾기</button>
+      </div>
+      
+      <ul id="station-list" class="station-list"></ul>
+    </div>
+    
+    <footer>
+      <p>원본 프로젝트: <a href="https://github.com/eddy961206/Trucker_Tunes" target="_blank">Trucker_Tunes</a></p>
+    </footer>
+  </div>
+
+  <script src="data/process_data.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
