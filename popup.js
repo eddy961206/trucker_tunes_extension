@@ -34,8 +34,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 이벤트 리스너 설정
   setupEventListeners();
   
-  // 볼륨 설정
-  audioPlayer.volume = document.getElementById('volume-slider').value;
+  // 볼륨 슬라이더 UI를 백그라운드 볼륨 값으로 맞추기
+  chrome.storage.local.get(['volume'], (result) => {
+    const volume = result.volume !== undefined ? result.volume : 0.4;
+    document.getElementById('volume-slider').value = volume;
+  });
   
   // 마지막 채널 선택
   // 백그라운드 스크립트와 통신 설정
@@ -404,3 +407,11 @@ function toggleFavorite(index) {
     displayStationList();
   }
 }
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === 'playbackStateChanged') {
+    isPlaying = message.data.isPlaying;
+    document.getElementById('play-btn').textContent = isPlaying ? 'Pause' : 'Play';
+  }
+});
+
