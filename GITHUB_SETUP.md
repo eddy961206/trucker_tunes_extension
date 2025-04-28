@@ -1,6 +1,6 @@
 # GitHub 저장소 설정 가이드
 
-이 가이드는 Trucker Tunes 크롬 확장프로그램을 GitHub 저장소에 추가하는 방법을 설명합니다.
+이 가이드는 TruckSim Radio 크롬 확장프로그램을 GitHub 저장소에 추가하는 방법을 설명합니다.
 
 ## 1. 새 GitHub 저장소 생성하기
 
@@ -28,7 +28,7 @@ git init
 git add .
 
 # 첫 번째 커밋 생성
-git commit -m "Initial commit: Chrome extension for Trucker Tunes"
+git commit -m "Initial commit: Chrome extension for TruckSim Radio"
 ```
 
 ## 3. GitHub 저장소에 연결하기
@@ -59,7 +59,7 @@ git push -u origin master
 1. 저장소 페이지에서 'Releases' 섹션으로 이동합니다.
 2. 'Create a new release' 버튼을 클릭합니다.
 3. 태그 버전을 'v1.0.0'으로 입력합니다.
-4. 릴리스 제목을 'Trucker Tunes Chrome Extension v1.0.0'으로 입력합니다.
+4. 릴리스 제목을 'TruckSim Radio Chrome Extension v1.0.0'으로 입력합니다.
 5. 설명에 주요 기능을 나열합니다.
 6. 'trucker_tunes_extension.zip' 파일을 업로드합니다.
 7. 'Publish release' 버튼을 클릭합니다.
@@ -76,4 +76,4 @@ git commit -m "Update README with installation links and screenshots"
 git push
 ```
 
-이제 Trucker Tunes 크롬 확장프로그램이 GitHub 저장소에 성공적으로 설정되었습니다!
+이제 TruckSim Radio 크롬 확장프로그램이 GitHub 저장소에 성공적으로 설정되었습니다!

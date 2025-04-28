@@ -1,4 +1,4 @@
-# Trucker Tunes Chrome Extension
+# TruckSim Radio Chrome Extension
 
 유로트럭2/아메리칸 트럭 시뮬레이터 라디오 스트리밍을 웹에서 들을 수 있는 크롬 확장프로그램입니다.
 

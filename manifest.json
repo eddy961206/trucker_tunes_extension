@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Trucker Tunes",
+  "name": "TruckSim Radio",
   "version": "1.0.0",
   "description": "Listen to Euro Truck Simulator 2 and American Truck Simulator radio streams in your browser",
   "icons": {
